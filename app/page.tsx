@@ -43,7 +43,7 @@ export default function Home() {
 
       {/* Main Page Content Flow */}
       <main className="relative z-10 flex flex-col">
-        {/* 3. Hero Section: Headline, dual CTAs, and key stats */}
+        {/* 3. Hero Section: Headline, dual CTAs, and key stats. */}
         <Hero />
 
         {/* 4. Interactive Pipeline Board: Live filterable Kanban preview */}
