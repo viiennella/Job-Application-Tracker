@@ -1,26 +1,169 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+/* Pretty Bright Pastel Pink & Honey Sunshine Theme */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light !important;
+  --background: #fff5f8;
+  --foreground: #2d1320;
+  --card: #ffffff;
+  --card-foreground: #2d1320;
+  --popover: #ffffff;
+  --popover-foreground: #2d1320;
+  --primary: #f43f5e;
+  --primary-hover: #e11d48;
+  --primary-foreground: #ffffff;
+  --secondary: #fef08a;
+  --secondary-foreground: #713f12;
+  --muted: #fdf2f8;
+  --muted-foreground: #9d174d;
+  --accent: #fef08a;
+  --accent-foreground: #713f12;
+  --destructive: #f43f5e;
+  --border: #fbcfe8;
+  --border-subtle: #fef08a;
+  --input: #fbcfe8;
+  --ring: #f472b6;
+  --radius: 1rem;
+
+  /* Pretty Pastel Status Accents */
+  --badge-applied: #7dd3fc;
+  --badge-interview: #d8b4fe;
+  --badge-offer: #6ee7b7;
+  --badge-rejected: #fda4af;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-destructive: var(--destructive);
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Dreamy Luminous Pastel Aurora Canvas */
+body {
+  background-color: #fff5f8;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(254, 205, 211, 0.7) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(254, 240, 138, 0.6) 0px, transparent 50%),
+    radial-gradient(at 50% 25%, rgba(255, 228, 230, 0.65) 0px, transparent 55%),
+    radial-gradient(at 100% 60%, rgba(254, 243, 199, 0.55) 0px, transparent 50%),
+    radial-gradient(at 0% 75%, rgba(251, 207, 232, 0.6) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, rgba(254, 226, 226, 0.5) 0px, transparent 50%),
+    radial-gradient(at 20% 100%, rgba(254, 249, 195, 0.5) 0px, transparent 50%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Pretty Soft Pastel Confetti Dots */
+.bg-grid-pattern {
+  background-image: radial-gradient(rgba(244, 114, 182, 0.20) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+}
+
+/* Ambient Radial Shimmer */
+.bg-radial-glow {
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(251, 113, 133, 0.18) 0%,
+    rgba(254, 240, 138, 0.22) 35%,
+    rgba(244, 114, 182, 0.12) 65%,
+    transparent 100%
+  );
+}
+
+/* Soft Frosted Glass with Pastel Glow */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(251, 207, 232, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(244, 114, 182, 0.15);
+}
+
+.glass-nav {
+  background: rgba(255, 248, 250, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1.5px solid rgba(251, 207, 232, 0.7);
+  box-shadow: 0 4px 20px -2px rgba(244, 114, 182, 0.08);
+}
+
+/* Pretty Pastel Scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(254, 240, 138, 0.25);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(244, 114, 182, 0.5);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 114, 182, 0.8);
+}
+
+/* Glowing Pastel Text Gradients */
+.text-gradient {
+  background: linear-gradient(135deg, #1f121a 0%, #be185d 50%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-accent {
+  background: linear-gradient(135deg, #ec4899 0%, #f43f5e 40%, #eab308 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Float Animations */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.animate-float {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
 }
