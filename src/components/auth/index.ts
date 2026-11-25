@@ -5,14 +5,25 @@
  */
 
 export * from "./types";
-export { AuthHeader } from "./AuthHeader";
-export { SocialAuthButtons } from "./SocialAuthButtons";
-export { AuthDivider } from "./AuthDivider";
-export { PasswordInput } from "./PasswordInput";
-export { RoleSelector } from "./RoleSelector";
-export { AuthTestimonialCard } from "./AuthTestimonialCard";
-export { AuthSuccessView } from "./AuthSuccessView";
-export { AuthFooter } from "./AuthFooter";
-export { SignInForm } from "./SignInForm";
-export { SignUpForm } from "./SignUpForm";
+
+
+export { AuthDivider } from "./form_components/AuthDivider";
+export { AuthEmail } from "./form_components/AuthEmail";
+export { NameInput } from "./form_components/NameInput";
+export { PasswordInput } from "./form_components/PasswordInput";
+export { RememberMe } from "./form_components/RememberMe";
+export { SubmitButton } from "./form_components/SubmitButton";
+export { TermsAndNewsCheckBox } from "./form_components/TermsAndNewsCheckBox";
+
+
+export { AuthFooter } from "./form_sections/AuthFooter";
+export { AuthHeader } from "./form_sections/AuthHeader";
+export { AuthSuccessView } from "./form_sections/AuthSuccessView";
+export { AuthTestimonialCard } from "./form_sections/AuthTestimonialCard";
+export { RoleSelector } from "./form_sections/RoleSelector";
+export { SocialAuthButtons } from "./form_sections/SocialAuthButtons";
+
+
+export { SignInForm } from "./forms/SignInForm";
+export { SignUpForm } from "./forms/SignUpForm";
 

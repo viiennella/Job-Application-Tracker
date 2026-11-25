@@ -6,7 +6,7 @@
 import React from "react";
 import Link from "next/link";
 import { CheckCircle2, ArrowRight } from "lucide-react";
-import { AuthMode } from "./types";
+import { AuthMode } from "../types";
 
 export interface AuthSuccessViewProps {
   mode: AuthMode;

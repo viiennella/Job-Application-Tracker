@@ -6,7 +6,7 @@
 
 import React from "react";
 import { Star, Check, TrendingUp } from "lucide-react";
-import { AuthShowcaseQuote } from "./types";
+import { AuthShowcaseQuote } from "../types";
 
 export interface AuthTestimonialCardProps {
   /** Testimonial quote object */
