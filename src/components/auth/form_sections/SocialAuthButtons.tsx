@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { SocialAuthProvider } from "./types";
+import { SocialAuthProvider } from "../types";
 
 export interface SocialAuthButtonsProps {
   /** Callback triggered when a provider button is clicked */
