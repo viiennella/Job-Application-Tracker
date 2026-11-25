@@ -24,7 +24,7 @@ import {
   FaqSection,
   CtaBanner,
   Footer,
-} from "@/components/landing";
+} from "@/src/components/landing";
 
 export default function Home() {
   return (
