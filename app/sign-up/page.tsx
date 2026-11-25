@@ -13,7 +13,7 @@ import {
   AuthTestimonialCard,
   AuthSuccessView,
   AuthFooter,
-} from "@/components/auth";
+} from "@/src/components/auth";
 
 export default function SignUpPage() {
   const [registeredData, setRegisteredData] = useState<{

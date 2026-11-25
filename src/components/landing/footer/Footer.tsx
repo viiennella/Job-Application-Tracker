@@ -1,3 +1,4 @@
+
 /**
  * @file Footer.tsx
  * @description Comprehensive site footer with bright pastel styling.
