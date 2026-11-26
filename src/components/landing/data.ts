@@ -24,6 +24,12 @@ export const DEFAULT_NAV_LINKS: NavLinkItem[] = [
   { label: "FAQ", href: "#faq" },
 ];
 
+export const AUTHENTICATED_NAV_LINKS: NavLinkItem[] = [
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Applications", href: "/applications" },
+  { label: "Interviews", href: "/interviews" },
+];
+
 /** Quick summary statistics displayed in the Hero section */
 export const DEFAULT_HERO_STATS: StatMetric[] = [
   { value: "48,000+", label: "Applications Tracked" },

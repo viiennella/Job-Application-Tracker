@@ -9,10 +9,9 @@
  * - Maintainable: Custom data and types can be easily configured or fetched from an external source via `@/components/landing/data.ts`.
  */
 
-import React from "react";
 import {
   TopBanner,
-  Navbar,
+  NavBar,
   Hero,
   PipelineBoard,
   CompanyLogos,
@@ -39,7 +38,7 @@ export default function Home() {
       <TopBanner />
 
       {/* 2. Main Navigation Bar with Next.js Link */}
-      <Navbar />
+      <NavBar />
 
       {/* Main Page Content Flow */}
       <main className="relative z-10 flex flex-col">
