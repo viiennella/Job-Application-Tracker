@@ -7,7 +7,7 @@
 
 import React, { useState } from "react";
 import { Lock, Eye, EyeOff } from "lucide-react";
-import { PasswordStrength } from "./types";
+import { PasswordStrength } from "../types";
 
 export interface PasswordInputProps {
   /** Current password value */

@@ -15,6 +15,13 @@
       "when": 1795573829959,
       "tag": "0001_swift_nicolaos",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795591555015,
+      "tag": "0002_broken_menace",
+      "breakpoints": true
     }
   ]
 }

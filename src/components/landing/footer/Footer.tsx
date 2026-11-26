@@ -5,12 +5,10 @@
  * Powered by Next.js Link.
  */
 
-import React from "react";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
 
   return (
     <footer className="border-t border-pink-200 bg-gradient-to-b from-white via-pink-50/40 to-yellow-50/30 py-12 px-6">
@@ -29,7 +27,7 @@ export function Footer() {
             The modern pastel job application tracker and career copilot. Helping professionals organize pipelines, master interviews, and negotiate top compensation packages.
           </p>
           <div className="text-[11px] text-pink-800 font-bold mt-6">
-            © {currentYear} CareerFlow Technologies Inc. All rights reserved.
+            © {2026} CareerFlow Technologies Inc. All rights reserved.
           </div>
         </div>
 

@@ -3,27 +3,43 @@
  * @description Fast 1-click social authentication buttons with bright pastel styling.
  */
 
-import React from "react";
-import { SocialAuthProvider } from "../types";
+
+
+import { signIn } from "@/src/lib/auth/auth-client";
+
 
 export interface SocialAuthButtonsProps {
-  /** Callback triggered when a provider button is clicked */
-  onSocialLogin?: (provider: SocialAuthProvider) => void;
-  /** Whether authentication action is currently disabled */
   disabled?: boolean;
 }
 
 export function SocialAuthButtons({
-  onSocialLogin,
   disabled = false,
 }: SocialAuthButtonsProps) {
+
+
+  const handleGoogleSignIn = async () => {
+    await signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard",
+    });
+  };
+
+  const handleGitHubSignIn = async () => {
+    await signIn.social({
+      provider: "github",
+      callbackURL: "/dashboard",
+    });
+  };
+
+
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {/* Google Sign-in */}
       <button
         type="button"
         disabled={disabled}
-        onClick={() => onSocialLogin?.("google")}
+        onClick={handleGoogleSignIn}
         className="flex items-center justify-center gap-2.5 rounded-2xl border-2 border-pink-200 bg-white py-3 px-4 text-xs font-bold text-slate-800 hover:bg-pink-50/70 hover:border-pink-300 shadow-2xs transition-all active:scale-[0.98] disabled:opacity-50"
       >
         <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
@@ -51,7 +67,7 @@ export function SocialAuthButtons({
       <button
         type="button"
         disabled={disabled}
-        onClick={() => onSocialLogin?.("github")}
+        onClick={handleGitHubSignIn}
         className="flex items-center justify-center gap-2.5 rounded-2xl border-2 border-pink-200 bg-white py-3 px-4 text-xs font-bold text-slate-800 hover:bg-pink-50/70 hover:border-pink-300 shadow-2xs transition-all active:scale-[0.98] disabled:opacity-50"
       >
         <svg

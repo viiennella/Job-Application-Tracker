@@ -57,7 +57,7 @@
 /* Dreamy Luminous Pastel Aurora Canvas */
 body {
   background-color: #fff5f8;
-  background-image: 
+  background-image:
     radial-gradient(at 0% 0%, rgba(254, 205, 211, 0.7) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(254, 240, 138, 0.6) 0px, transparent 50%),
     radial-gradient(at 50% 25%, rgba(255, 228, 230, 0.65) 0px, transparent 55%),
@@ -83,13 +83,11 @@ body {
 
 /* Ambient Radial Shimmer */
 .bg-radial-glow {
-  background: radial-gradient(
-    circle at 50% 0%,
-    rgba(251, 113, 133, 0.18) 0%,
-    rgba(254, 240, 138, 0.22) 35%,
-    rgba(244, 114, 182, 0.12) 65%,
-    transparent 100%
-  );
+  background: radial-gradient(circle at 50% 0%,
+      rgba(251, 113, 133, 0.18) 0%,
+      rgba(254, 240, 138, 0.22) 35%,
+      rgba(244, 114, 182, 0.12) 65%,
+      transparent 100%);
 }
 
 /* Soft Frosted Glass with Pastel Glow */
@@ -143,9 +141,12 @@ body {
 
 /* Float Animations */
 @keyframes floatSlow {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -156,9 +157,12 @@ body {
 }
 
 @keyframes pulseGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.7;
   }
+
   50% {
     opacity: 1;
   }

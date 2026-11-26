@@ -7,8 +7,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { User, Mail, Sparkles, ShieldCheck } from "lucide-react";
+import { Sparkles, ShieldCheck } from "lucide-react";
 import { SocialAuthButtons } from "../form_sections/SocialAuthButtons";
 import { AuthDivider } from "../form_components/AuthDivider";
 import { PasswordInput } from "../form_components/PasswordInput";
@@ -16,7 +15,7 @@ import { RoleSelector } from "../form_sections/RoleSelector";
 import { SubmitButton } from "../form_components/SubmitButton";
 import { NameInput } from "../form_components/NameInput";
 
-import { signUp } from "@/lib/auth/auth-client";
+import { signUp } from "@/src/lib/auth/auth-client";
 import { AuthEmail } from "../form_components/AuthEmail";
 import { TermsAndNewsCheckBox } from "../form_components/TermsAndNewsCheckBox";
 
@@ -33,26 +32,39 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [newsletter, setNewsletter] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!agreedTerms) return;
+
     setIsLoading(true);
+    setErrorMessage("");
 
-    // try {
-    //   const result = await signUp.email({
-    //     email,
-    //     password,
-    //     name: fullName,
-    //   });
+    try {
+      const { error } = await signUp.email({
+        name: fullName,
+        email,
+        password,
+        careerFocus: selectedRole,
+        newsletter,
+        callbackURL: "/dashboard",
+      });
 
+      if (error) {
+        setErrorMessage(error.message ?? "Something went wrong.");
+        return;
+      }
 
-    // }
-    // catch (err) {
-
-
-    // }
+      onSuccess?.({ name: fullName, email });
+    } catch (error) {
+      setErrorMessage("Unable to create your account. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
 
   return (
     <div className="space-y-6">
@@ -102,8 +114,20 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
         {/* Terms & Newsletter Checkboxes */}
         <TermsAndNewsCheckBox agreedTerms={agreedTerms} setAgreedTerms={setAgreedTerms} newsletter={newsletter} setNewsletter={setNewsletter} />
 
+        {errorMessage && (
+          <div
+            role="alert"
+            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+          >
+            {errorMessage}
+          </div>
+        )}
+
 
         <SubmitButton isLoading={isLoading} agreedTerms={agreedTerms} text="Create Account & Launch Board" />
+
+
+
       </form>
 
       {/* Trust Footer */}

@@ -8,7 +8,7 @@ export * from "./types";
 export * from "./data";
 
 export { TopBanner } from "./top-banner/TopBanner";
-export { Navbar } from "./navbar/Navbar";
+export { NavBar } from "./navbar/NavBar";
 export { Hero } from "./hero/Hero";
 export { PipelineBoard } from "./pipeline-board/PipelineBoard";
 export { PipelineJobCard } from "./pipeline-board/PipelineJobCard";

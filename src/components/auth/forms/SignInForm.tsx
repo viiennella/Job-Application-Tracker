@@ -8,13 +8,14 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Mail, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { SocialAuthButtons } from "../form_sections/SocialAuthButtons";
 import { AuthDivider } from "../form_components/AuthDivider";
 import { PasswordInput } from "../form_components/PasswordInput";
 import { SubmitButton } from "../form_components/SubmitButton";
 import { AuthEmail } from "../form_components/AuthEmail";
 import { RememberMe } from "../form_components/RememberMe";
+import { signIn } from "@/src/lib/auth/auth-client";
 
 export interface SignInFormProps {
   /** Callback fired upon successful form submission */
@@ -26,15 +27,35 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
+    setIsLoading(true);
+    setErrorMessage("");
+
+    try {
+      const { error } = await signIn.email({
+        email,
+        password,
+        rememberMe,
+        callbackURL: "/dashboard",
+      });
+
+      if (error) {
+        setErrorMessage(error.message ?? "Invalid email or password.");
+        return;
+      }
+
       onSuccess?.(email);
-    }, 900);
+    } catch (error) {
+      setErrorMessage("Unable to sign in. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+
+
   };
 
   return (
@@ -79,11 +100,24 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         {/* Remember Me */}
         <RememberMe rememberMe={rememberMe} setRememberMe={setRememberMe} />
 
+
+        {errorMessage && (
+          <div
+            role="alert"
+            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+          >
+            {errorMessage}
+          </div>
+        )}
+
         {/* Submit Button with Bright Pastel Pink-to-Yellow gradient */}
         <SubmitButton
           isLoading={isLoading}
           text="Sign In & Open Pipeline"
         />
+
+
+
       </form>
 
       {/* Trust Footer */}
