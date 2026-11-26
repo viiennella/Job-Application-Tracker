@@ -1,72 +1,36 @@
-import {
-    pgTable,
-    uuid,
-    varchar,
-    text,
-    timestamp,
-    integer,
-    index,
-} from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { index, integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+// Relative import on purpose: drizzle-kit doesn't always resolve the "@/" alias.
+import { STAGES } from "@/src/lib/applications";
+import { user } from "./auth-schema";
 
-export const users = pgTable("users", {
-    id: uuid("id").primaryKey().defaultRandom(),
-    email: varchar("email", { length: 255 }).notNull().unique(),
-    name: varchar("name", { length: 255 }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-        .defaultNow()
-        .notNull(),
-});
+export * from "./auth-schema";
 
-export const applications = pgTable("applications", {
-    id: uuid("id").primaryKey().defaultRandom(),
+export const applicationStage = pgEnum("application_stage", STAGES);
 
-    userId: uuid("user_id")
-        .notNull()
-        .references(() => users.id, { onDelete: "cascade" }),
-
-    companyName: varchar("company_name", { length: 255 }).notNull(),
-
-    jobTitle: varchar("job_title", { length: 255 }).notNull(),
-
-    jobUrl: text("job_url"),
-
-    location: varchar("location", { length: 255 }),
-
-    employmentType: varchar("employment_type", { length: 100 }),
-
-    salary: integer("salary"),
-
-    status: varchar("status", { length: 50 })
-        .notNull()
-        .default("applied"),
-
-    notes: text("notes"),
-
-    appliedAt: timestamp("applied_at", { withTimezone: true })
-        .defaultNow()
-        .notNull(),
-
-    createdAt: timestamp("created_at", { withTimezone: true })
-        .defaultNow()
-        .notNull(),
-
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-        .defaultNow()
-        .notNull(),
-},
-    (table) => [
-        index("applications_user_id_idx").on(table.userId),
-
-        index("applications_user_status_idx").on(
-            table.userId,
-            table.status
-        ),
-
-        index("applications_user_applied_at_idx").on(
-            table.userId,
-            table.appliedAt
-        ),
-    ]
-
-
+export const jobApplication = pgTable(
+    "job_application",
+    {
+        id: uuid("id").defaultRandom().primaryKey(),
+        userId: text("user_id")
+            .notNull()
+            .references(() => user.id, { onDelete: "cascade" }),
+        company: text("company").notNull(),
+        role: text("role").notNull(),
+        location: text("location"),
+        salary: text("salary"),
+        stage: applicationStage("stage").notNull().default("wishlist"),
+        jobUrl: text("job_url"),
+        tags: text("tags").array().notNull().default(sql`'{}'::text[]`),
+        nextStep: text("next_step"),
+        /** Optional 0-100. Not collected yet; the card hides the bar when null. */
+        matchScore: integer("match_score"),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+        updatedAt: timestamp("updated_at")
+            .defaultNow()
+            .$onUpdate(() => new Date())
+            .notNull(),
+    },
+    // Every dashboard query is "this user's applications", so index for it.
+    (t) => [index("job_application_user_stage_idx").on(t.userId, t.stage)],
 );

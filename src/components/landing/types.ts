@@ -4,9 +4,14 @@
  * Exported for modular use across the application.
  */
 
-export type PipelineStage = "wishlist" | "applied" | "interviewing" | "offer";
+
 
 /** Represents a single job opportunity card in the pipeline preview */
+
+import type { Stage } from "@/src/lib/applications";
+
+export type PipelineStage = Stage;
+
 export interface JobCard {
   id: string;
   company: string;
@@ -17,11 +22,12 @@ export interface JobCard {
   stageLabel: string;
   tags: string[];
   appliedDate: string;
-  matchScore: number;
+  matchScore: number | null;
   nextStep?: string;
   logoBg: string;
   logoLetter: string;
 }
+
 
 /** Represents a statistical highlight metric */
 export interface StatMetric {

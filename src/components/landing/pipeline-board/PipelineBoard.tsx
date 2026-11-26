@@ -1,171 +1,296 @@
-/**
- * @file PipelineBoard.tsx
- * @description Interactive Pipeline Kanban board showcase with filter tabs,
- * stage counts, and browser extension quick-capture callout.
- * Bright pastel pink & buttery yellow accents.
- */
+
+// "use client";
+
+// import { useState } from "react";
+
+// import type { JobCard, PipelineStage } from "../types";
+// import { DEFAULT_MOCK_JOBS } from "../data";
+
+// import type { PipelineTab } from "./PipelineBoardComponents/PipelineFilters";
+
+// import { PipelineBoardHeader } from "./PipelineBoardComponents/PipelineBoardHeader";
+// import { PipelineFilters } from "./PipelineBoardComponents/PipelineFilters";
+// import { PipelineStatusIndicators } from "./PipelineBoardComponents/PipelineStatusIndicators";
+// import { PipelineJobGrid } from "./PipelineBoardComponents/PipelineJobGrid";
+// import { PipelineExtensionBanner } from "./PipelineBoardComponents/PipelineExtensionBanner";
+
+// export interface PipelineBoardProps {
+//   /** Optional custom list of jobs */
+//   jobs?: JobCard[];
+
+//   /** Extension download link */
+//   extensionHref?: string;
+
+//   /** Optional pipeline summary information */
+//   statusSummary?: {
+//     verbalOffers?: number;
+//     nextLoop?: string;
+//   };
+// }
+
+// export function PipelineBoard({
+//   jobs = DEFAULT_MOCK_JOBS,
+//   extensionHref = "/sign-up",
+//   statusSummary,
+// }: PipelineBoardProps) {
+//   const [activeTab, setActiveTab] = useState<PipelineTab>("all");
+
+//   // Calculate stage counts in a single pass.
+//   const stageCounts = jobs.reduce<Record<PipelineStage, number>>(
+//     (counts, job) => {
+//       counts[job.stage] += 1;
+//       return counts;
+//     },
+//     {
+//       wishlist: 0,
+//       applied: 0,
+//       interviewing: 0,
+//       offer: 0,
+//     },
+//   );
+
+//   // Filter jobs based on the selected stage.
+//   const filteredJobs =
+//     activeTab === "all"
+//       ? jobs
+//       : jobs.filter((job) => job.stage === activeTab);
+
+//   return (
+//     <section
+//       id="pipeline"
+//       className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6"
+//     >
+//       <PipelineBoardHeader />
+
+//       {/* Filter Bar */}
+//       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-pink-200 bg-white/90 p-2 shadow-md shadow-pink-100">
+//         <PipelineFilters
+//           activeTab={activeTab}
+//           onTabChange={setActiveTab}
+//           totalCount={jobs.length}
+//           stageCounts={stageCounts}
+//         />
+
+//         <PipelineStatusIndicators
+//           verbalOffers={statusSummary?.verbalOffers}
+//           nextLoop={statusSummary?.nextLoop}
+//         />
+//       </div>
+
+//       {/* Job Cards */}
+//       <PipelineJobGrid jobs={filteredJobs} />
+
+//       {/* Extension Banner */}
+//       <PipelineExtensionBanner extensionHref={extensionHref} />
+//     </section>
+//   );
+// }
+
 
 "use client";
 
-import React, { useState } from "react";
-import Link from "next/link";
-import { Plus } from "lucide-react";
-import { JobCard, PipelineStage } from "../types";
-import { DEFAULT_MOCK_JOBS } from "../data";
-import { PipelineJobCard } from "./PipelineJobCard";
+import { useMemo, useOptimistic, useState, useTransition } from "react";
 
-export interface PipelineBoardProps {
-  /** Optional custom list of jobs */
-  jobs?: JobCard[];
-  /** Extension download link */
-  extensionHref?: string;
+import {
+  STAGES,
+  STAGE_CONFIG,
+  type ActionResult,
+  type Application,
+  type Stage,
+} from "@/src/lib/applications";
+
+import {
+  deleteApplication,
+  moveApplication,
+} from "@/src/lib/actions";
+
+import { ApplicationCard } from "@/src/components/dashboard/ApplicationCard";
+import { PipelineBoardHeader } from "@/src/components/landing/pipeline-board/PipelineBoardComponents/PipelineBoardHeader";
+import {
+  PipelineFilters,
+  type PipelineTab,
+} from "@/src/components/landing/pipeline-board/PipelineBoardComponents/PipelineFilters";
+
+type OptimisticAction =
+  | { type: "move"; id: string; stage: Stage }
+  | { type: "delete"; id: string };
+
+interface PipelineBoardProps {
+  applications: Application[];
 }
 
-export function PipelineBoard({
-  jobs = DEFAULT_MOCK_JOBS,
-  extensionHref = "/sign-up",
-}: PipelineBoardProps) {
-  const [activeTab, setActiveTab] = useState<"all" | PipelineStage>("all");
+export function PipelineBoard({ applications }: PipelineBoardProps) {
+  const [activeTab, setActiveTab] = useState<PipelineTab>("all");
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
-  const filteredJobs =
-    activeTab === "all" ? jobs : jobs.filter((job) => job.stage === activeTab);
+  const [items, applyOptimistic] = useOptimistic(
+    applications,
+    (state, action: OptimisticAction) =>
+      action.type === "delete"
+        ? state.filter((a) => a.id !== action.id)
+        : state.map((a) =>
+          a.id === action.id
+            ? { ...a, stage: action.stage }
+            : a
+        )
+  );
 
-  // Compute live stage counts
-  const stageCounts = {
-    wishlist: jobs.filter((j) => j.stage === "wishlist").length,
-    applied: jobs.filter((j) => j.stage === "applied").length,
-    interviewing: jobs.filter((j) => j.stage === "interviewing").length,
-    offer: jobs.filter((j) => j.stage === "offer").length,
-  };
+  // Group all applications in one pass.
+  const grouped = useMemo(() => {
+    const result: Record<Stage, Application[]> = {
+      wishlist: [],
+      applied: [],
+      interviewing: [],
+      offer: [],
+    };
+
+    for (const application of items) {
+      result[application.stage].push(application);
+    }
+
+    return result;
+  }, [items]);
+
+  const stageCounts = useMemo(() => {
+    return {
+      wishlist: grouped.wishlist.length,
+      applied: grouped.applied.length,
+      interviewing: grouped.interviewing.length,
+      offer: grouped.offer.length,
+    };
+  }, [grouped]);
+
+  function run(
+    action: OptimisticAction,
+    request: () => Promise<ActionResult>
+  ) {
+    setError(null);
+
+    startTransition(async () => {
+      applyOptimistic(action);
+
+      try {
+        const result = await request();
+
+        if (!result.ok) {
+          setError(result.error);
+        }
+      } catch {
+        setError("Something went wrong. Please try again.");
+      }
+    });
+  }
+
+  function handleMove(id: string, stage: Stage) {
+    run(
+      { type: "move", id, stage },
+      () => moveApplication(id, stage)
+    );
+  }
+
+  function handleDelete(id: string) {
+    if (!window.confirm("Delete this application? This can't be undone.")) {
+      return;
+    }
+
+    run(
+      { type: "delete", id },
+      () => deleteApplication(id)
+    );
+  }
+
+  function renderCard(application: Application) {
+    return (
+      <ApplicationCard
+        key={application.id}
+        application={application}
+        onMove={handleMove}
+        onDelete={handleDelete}
+      />
+    );
+  }
 
   return (
-    <section id="pipeline" className="px-4 sm:px-6 py-12 max-w-7xl mx-auto w-full">
-      {/* Section Header */}
-      <div className="text-center mb-8">
-        <span className="text-xs font-bold uppercase tracking-wider text-pink-600 bg-pink-100 border border-pink-200 px-3 py-1 rounded-full">
-          Interactive Workspace Preview
-        </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
-          Your Entire Pipeline, Visually Mastered
-        </h2>
-        <p className="text-sm sm:text-base text-slate-600 max-w-xl mx-auto mt-2">
-          Filter by status, view active interview dates, check ATS match scores, and track compensation targets.
-        </p>
-      </div>
+    <div className="min-w-0">
+      <PipelineBoardHeader count={items.length} />
 
-      {/* Filter Tabs Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 bg-white/90 p-2 rounded-2xl border-2 border-pink-200 shadow-md shadow-pink-100">
-        <div className="flex flex-wrap items-center gap-1.5" role="tablist">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "all"}
-            onClick={() => setActiveTab("all")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              activeTab === "all"
-                ? "bg-gradient-to-r from-pink-400 via-rose-300 to-yellow-300 text-pink-950 shadow-sm"
-                : "text-slate-700 hover:bg-pink-50"
-            }`}
-          >
-            All Opportunities ({jobs.length})
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "wishlist"}
-            onClick={() => setActiveTab("wishlist")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              activeTab === "wishlist"
-                ? "bg-amber-200 text-amber-950 border border-amber-300 shadow-sm"
-                : "text-slate-700 hover:bg-amber-50"
-            }`}
-          >
-            Wishlist ({stageCounts.wishlist})
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "applied"}
-            onClick={() => setActiveTab("applied")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              activeTab === "applied"
-                ? "bg-sky-200 text-sky-950 border border-sky-300 shadow-sm"
-                : "text-slate-700 hover:bg-sky-50"
-            }`}
-          >
-            Applied ({stageCounts.applied})
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "interviewing"}
-            onClick={() => setActiveTab("interviewing")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              activeTab === "interviewing"
-                ? "bg-purple-200 text-purple-950 border border-purple-300 shadow-sm"
-                : "text-slate-700 hover:bg-purple-50"
-            }`}
-          >
-            Interviewing ({stageCounts.interviewing})
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "offer"}
-            onClick={() => setActiveTab("offer")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              activeTab === "offer"
-                ? "bg-emerald-200 text-emerald-950 border border-emerald-300 shadow-sm"
-                : "text-slate-700 hover:bg-emerald-50"
-            }`}
-          >
-            Offers ({stageCounts.offer})
-          </button>
-        </div>
+      <PipelineFilters
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        totalCount={items.length}
+        stageCounts={stageCounts}
+      />
 
-        {/* Live Status Indicators */}
-        <div className="hidden lg:flex items-center gap-3 text-xs text-slate-600 px-3 font-medium">
-          <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" aria-hidden="true" />
-            <span>2 Verbal Offers Active</span>
-          </span>
-          <span>•</span>
-          <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-400" aria-hidden="true" />
-            <span>Next Loop: Tomorrow 2pm</span>
-          </span>
-        </div>
-      </div>
-
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredJobs.map((job) => (
-          <PipelineJobCard key={job.id} job={job} />
-        ))}
-      </div>
-
-      {/* 1-Click Extension Action Banner with Pastel Sunset Gradient */}
-      <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-3xl border-2 border-pink-200 bg-gradient-to-r from-pink-100 via-yellow-100 to-rose-100 p-6 shadow-lg shadow-pink-100">
-        <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-2xl bg-white shadow-xs text-pink-600 flex items-center justify-center shrink-0">
-            <Plus className="h-6 w-6 stroke-[2.5]" />
-          </div>
-          <div>
-            <h3 className="font-extrabold text-slate-900 text-base">
-              Add Any Role in 1 Click via Chrome Extension
-            </h3>
-            <p className="text-xs text-slate-700 font-medium">
-              Save postings from LinkedIn, Indeed, Greenhouse, and Ashby without copy-pasting.
-            </p>
-          </div>
-        </div>
-        <Link
-          href={extensionHref}
-          className="rounded-2xl bg-gradient-to-r from-pink-400 via-rose-300 to-yellow-300 text-pink-950 font-extrabold px-5 py-2.5 text-xs shadow-md shadow-pink-200 hover:from-pink-500 hover:to-yellow-400 transition-all shrink-0"
+      {error && (
+        <p
+          role="alert"
+          className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-800"
         >
-          Get Extension (Free)
-        </Link>
-      </div>
-    </section>
+          {error}
+        </p>
+      )}
+
+      {isPending && (
+        <p className="sr-only" role="status" aria-live="polite">
+          Saving application changes...
+        </p>
+      )}
+
+      {items.length === 0 ? (
+        <div className="rounded-3xl border-2 border-dashed border-pink-200 bg-white/80 px-6 py-16 text-center">
+          <h2 className="text-lg font-extrabold text-slate-900">
+            No applications yet
+          </h2>
+
+          <p className="mx-auto mt-1 max-w-sm text-sm font-medium text-slate-600">
+            Save a role you are interested in, or one you have
+            already applied to, and it will show up here.
+          </p>
+        </div>
+      ) : activeTab === "all" ? (
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          {STAGES.map((stage) => (
+            <section
+              key={stage}
+              aria-label={STAGE_CONFIG[stage].label}
+              className="min-w-0 space-y-3"
+            >
+              <h2 className="flex items-center gap-2 px-1 text-sm font-extrabold text-slate-900">
+                <span
+                  className={`h-2.5 w-2.5 shrink-0 rounded-full ${STAGE_CONFIG[stage].dot}`}
+                  aria-hidden="true"
+                />
+
+                {STAGE_CONFIG[stage].label}
+
+                <span className="font-bold text-slate-600">
+                  {grouped[stage].length}
+                </span>
+              </h2>
+
+              {grouped[stage].length === 0 ? (
+                <p className="rounded-2xl border-2 border-dashed border-pink-200 px-3 py-6 text-center text-xs font-medium text-slate-600">
+                  Nothing here yet
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {grouped[stage].map(renderCard)}
+                </div>
+              )}
+            </section>
+          ))}
+        </div>
+      ) : grouped[activeTab].length === 0 ? (
+        <p className="rounded-3xl border-2 border-dashed border-pink-200 bg-white/80 px-6 py-12 text-center text-sm font-medium text-slate-600">
+          No applications in{" "}
+          {STAGE_CONFIG[activeTab].label.toLowerCase()} yet.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {grouped[activeTab].map(renderCard)}
+        </div>
+      )}
+    </div>
   );
 }

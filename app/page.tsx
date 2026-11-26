@@ -25,6 +25,9 @@ import {
   Footer,
 } from "@/src/components/landing";
 
+import { DEFAULT_MOCK_JOBS } from "@/src/components/landing/data";
+import { LandingPipelineBoard } from "@/src/components/landing/pipeline-board/LandingPipelineBoard";
+
 export default function Home() {
   return (
     <div className="relative min-h-screen text-[var(--foreground)] overflow-x-hidden selection:bg-pink-300/50 selection:text-pink-950">
@@ -46,7 +49,9 @@ export default function Home() {
         <Hero />
 
         {/* 4. Interactive Pipeline Board: Live filterable Kanban preview */}
-        <PipelineBoard />
+        <LandingPipelineBoard
+          jobs={DEFAULT_MOCK_JOBS}
+        />
 
         {/* 5. Company Logos: Social proof strip */}
         <CompanyLogos />
